@@ -1,134 +1,137 @@
-
-        <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Whack-a-Lego</title>
-    <style>
-        body {
-            margin: 0;
-            background: linear-gradient(135deg, #ff9900, #ffcc00);
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-            user-select: none;
-        }
-        #game-container {
-            text-align: center;
-            width: 100%;
-            max-width: 500px;
-        }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Whack-a-Lego</title>
+<style>
+    body {
+        margin: 0;
+        background: linear-gradient(135deg, #ff9900, #ffcc00);
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        overflow: hidden;
+        user-select: none;
+    }
+    #game-container {
+        text-align: center;
+        width: 100%;
+        max-width: 500px;
+    }
+    canvas {
+        border: 3px solid #222;
+        background-color: #00aa00;
+        max-width: 90vw;
+        max-height: 65vh;
+        display: block;
+        margin: 10px auto;
+        border-radius: 10px;
+        position: relative;
+        z-index: 1;
+    }
+    #menu {
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #fff;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        z-index: 10;
+    }
+    #menu p {
+        margin: 0 0 10px;
+        font-size: 16px;
+        color: #222;
+    }
+    #menu input {
+        padding: 8px;
+        font-size: 14px;
+        width: 160px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        outline: none;
+    }
+    #menu button {
+        padding: 8px 20px;
+        font-size: 14px;
+        background-color: #ff4500;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+    #menu button:hover {
+        background-color: #cc3700;
+    }
+    #score {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        color: #fff;
+        font-size: 16px;
+        background: rgba(0,0,0,0.6);
+        padding: 5px 10px;
+        border-radius: 5px;
+        text-shadow: 1px 1px 2px #000;
+        user-select: none;
+        z-index: 12;
+    }
+    #game-over {
+        display: none;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        text-align: center;
+        z-index: 20;
+    }
+    #game-over p {
+        font-size: 20px;
+        color: #ff4500;
+        margin: 0 0 10px;
+    }
+    #game-over button {
+        padding: 8px 20px;
+        font-size: 14px;
+        background-color: #ff4500;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    #game-over button:hover {
+        background-color: #cc3700;
+    }
+    @media (max-width: 600px) {
         canvas {
-            border: 3px solid #222;
-            background-color: #00aa00;
-            max-width: 90vw;
-            max-height: 65vh;
-            display: block;
-            margin: 10px auto;
-            border-radius: 10px;
+            width: 90vw;
+            height: 55vh;
         }
-        #menu {
-            position: absolute;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #fff;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            z-index: 10;
-        }
-        #menu p {
-            margin: 0 0 10px;
-            font-size: 16px;
-            color: #222;
+        #menu p, #menu input, #menu button, #score, #game-over p, #game-over button {
+            font-size: 12px;
         }
         #menu input {
-            padding: 8px;
-            font-size: 14px;
-            width: 160px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            outline: none;
+            width: 130px;
         }
-        #menu button {
-            padding: 8px 20px;
-            font-size: 14px;
-            background-color: #ff4500;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-        #menu button:hover {
-            background-color: #cc3700;
-        }
-        #score {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            color: #fff;
-            font-size: 16px;
-            background: rgba(0,0,0,0.6);
-            padding: 5px 10px;
-            border-radius: 5px;
-            text-shadow: 1px 1px 2px #000;
-        }
-        #game-over {
-            display: none;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            text-align: center;
-            z-index: 10;
-        }
-        #game-over p {
-            font-size: 20px;
-            color: #ff4500;
-            margin: 0 0 10px;
-        }
-        #game-over button {
-            padding: 8px 20px;
-            font-size: 14px;
-            background-color: #ff4500;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        #game-over button:hover {
-            background-color: #cc3700;
-        }
-        @media (max-width: 600px) {
-            canvas {
-                width: 90vw;
-                height: 55vh;
-            }
-            #menu p, #menu input, #menu button, #score, #game-over p, #game-over button {
-                font-size: 12px;
-            }
-            #menu input {
-                width: 130px;
-            }
-        }
-    </style>
+    }
+</style>
 </head>
 <body>
     <div id="game-container">
         <div id="menu">
             <p>Parent: Set Coin Limit (e.g., 5000)</p>
-            <input type="number" id="coin-limit" placeholder="Enter coin limit">
-            <br>
+            <input type="number" id="coin-limit" placeholder="Enter coin limit" />
+            <br />
             <button onclick="startGame()">Start Game</button>
         </div>
         <div id="score">Coins: 0/0 | Candy: 0</div>
@@ -139,198 +142,279 @@
             <button onclick="resetGame()">Play Again</button>
         </div>
     </div>
+<script>
+    const canvas = document.getElementById('game-canvas');
+    const ctx = canvas.getContext('2d');
+    const holes = [
+        {x: 50, y: 100}, {x: 150, y: 100}, {x: 250, y: 100}, {x: 350, y: 100},
+        {x: 50, y: 200}, {x: 150, y: 200}, {x: 250, y: 200}, {x: 350, y: 200}
+    ];
+    let moles = [];
+    let coins = 0;
+    let candy = 0;
+    let coinLimit = 0;
+    let lastPopTime = 0;
+    let gameRunning = false;
 
-    <script>
-        const canvas = document.getElementById('game-canvas');
-        const ctx = canvas.getContext('2d');
-        const holes = [
-            {x: 50, y: 100}, {x: 150, y: 100}, {x: 250, y: 100}, {x: 350, y: 100},
-            {x: 50, y: 200}, {x: 150, y: 200}, {x: 250, y: 200}, {x: 350, y: 200}
-        ];
-        let moles = [];
-        let coins = 0;
-        let candy = 0;
-        let coinLimit = 0;
-        let lastPopTime = 0;
-        let gameRunning = false;
-
-        function drawLegoMinifig(x, y) {
-            ctx.fillStyle = '#FFFF00';
-            ctx.beginPath();
-            ctx.arc(x + 25, y + 10, 15, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.fillStyle = ['#0000FF', '#FF0000', '#00FF00'][Math.floor(Math.random() * 3)];
-            ctx.fillRect(x + 10, y + 25, 30, 30);
-            ctx.fillStyle = '#FFFF00';
-            ctx.fillRect(x, y + 25, 10, 30);
-            ctx.fillRect(x + 40, y + 25, 10, 30);
-            ctx.fillStyle = '#FF0000';
-            ctx.fillRect(x + 10, y + 55, 15, 20);
-            ctx.fillRect(x + 25, y + 55, 15, 20);
-            ctx.fillStyle = '#000000';
-            ctx.beginPath();
-            ctx.arc(x + 20, y + 5, 2, 0, Math.PI * 2);
-            ctx.arc(x + 30, y + 5, 2, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.strokeStyle = '#000000';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.arc(x + 25, y + 12, 5, 0, Math.PI);
-            ctx.stroke();
+    // Particle animation for candy or coin bursts
+    class Particle {
+        constructor(x, y, type) {
+            this.x = x;
+            this.y = y;
+            this.type = type; // 'candy' or 'coin' or 'confetti'
+            this.life = 40 + Math.random() * 20;
+            this.vx = (Math.random() - 0.5) * 3;
+            this.vy = (Math.random() - 1.5) * 3;
+            this.size = 12 + Math.random() * 4;
+            this.rotation = Math.random() * 2 * Math.PI;
+            this.rotationSpeed = (Math.random() - 0.5) * 0.2;
+            // Color choices for confetti
+            this.color = ['#FF69B4', '#FFEA00', '#00FFC2', '#FF4C4C'][Math.floor(Math.random() * 4)];
         }
-
-        function drawHoles() {
-            ctx.fillStyle = '#222222';
-            holes.forEach(hole => {
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            this.vy += 0.12; // Gravity
+            this.rotation += this.rotationSpeed;
+            this.life--;
+        }
+        draw(ctx) {
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.rotation);
+            if (this.type === 'candy') {
+                ctx.fillStyle = '#FF69B4'; // pink candy
                 ctx.beginPath();
-                ctx.ellipse(hole.x + 25, hole.y + 50, 25, 10, 0, 0, Math.PI * 2);
+                ctx.moveTo(0, 0);
+                for(let i=0; i<5; i++) {
+                    ctx.lineTo(7 * Math.cos(i * 2 * Math.PI / 5), 7 * Math.sin(i * 2 * Math.PI / 5));
+                    ctx.lineTo(3.5 * Math.cos((i+0.5)*2*Math.PI/5), 3.5 * Math.sin((i+0.5)*2*Math.PI/5));
+                }
+                ctx.closePath();
                 ctx.fill();
-            });
+            } else if (this.type === 'coin') {
+                ctx.fillStyle = '#FFD700'; // gold coin
+                ctx.beginPath();
+                ctx.ellipse(0, 0, 7, 10, 0, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.strokeStyle = '#DAA520';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+                ctx.fillStyle = '#DAA520';
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('¢', 0, 5);
+            } else if (this.type === 'confetti') {
+                ctx.fillStyle = this.color;
+                ctx.fillRect(-2, -4, 4, 8);
+            }
+            ctx.restore();
         }
+        isAlive() {
+            return this.life > 0;
+        }
+    }
 
-        // New: Draw vendor behind holes
-        function drawVendor() {
-            // Vendor Body
-            ctx.fillStyle = '#C0A060';
-            ctx.fillRect(170, 10, 60, 100);
-            // Vendor Head
-            ctx.fillStyle = '#FFC080';
+    let particles = [];
+
+    function emitParticles(type, x, y, count) {
+        for (let i=0; i<count; i++) {
+            if (i % 4 === 0) {
+                // Every 4th particle is confetti for mix
+                particles.push(new Particle(x, y, 'confetti'));
+            } else {
+                particles.push(new Particle(x, y, type));
+            }
+        }
+    }
+
+    function drawLegoMinifig(x, y) {
+        ctx.save();
+        ctx.fillStyle = '#FFFF00';
+        ctx.beginPath();
+        ctx.arc(x + 25, y + 10, 15, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = ['#0000FF', '#FF0000', '#00FF00'][Math.floor(Math.random() * 3)];
+        ctx.fillRect(x + 10, y + 25, 30, 30);
+        ctx.fillStyle = '#FFFF00';
+        ctx.fillRect(x, y + 25, 10, 30);
+        ctx.fillRect(x + 40, y + 25, 10, 30);
+        ctx.fillStyle = '#FF0000';
+        ctx.fillRect(x + 10, y + 55, 15, 20);
+        ctx.fillRect(x + 25, y + 55, 15, 20);
+        ctx.fillStyle = '#000000';
+        ctx.beginPath();
+        ctx.arc(x + 20, y + 5, 2, 0, Math.PI * 2);
+        ctx.arc(x + 30, y + 5, 2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(x + 25, y + 12, 5, 0, Math.PI);
+        ctx.stroke();
+        ctx.restore();
+    }
+
+    function drawHoles() {
+        ctx.save();
+        ctx.fillStyle = '#222222';
+        holes.forEach(hole => {
             ctx.beginPath();
-            ctx.arc(200, 30, 22, 0, Math.PI * 2);
+            ctx.ellipse(hole.x + 25, hole.y + 50, 25, 10, 0, 0, Math.PI * 2);
             ctx.fill();
-            // Vendor Face/Eyes
-            ctx.fillStyle = '#000';
-            ctx.beginPath();
-            ctx.arc(190, 28, 3, 0, Math.PI * 2);
-            ctx.arc(210, 28, 3, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.strokeStyle = '#000';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.arc(200, 35, 7, 0, Math.PI);
-            ctx.stroke();
-            // Vendor Stand
-            ctx.fillStyle = '#825F19';
-            ctx.fillRect(160, 110, 80, 18);
-            ctx.font = "bold 18px Arial";
-            ctx.fillStyle = '#fff';
-            ctx.fillText('Vendor', 170, 123);
-        }
-
-        // New: Celebration popup
-        function showCelebration(type, amount) {
-            const celebrationDiv = document.createElement('div');
-            celebrationDiv.style.position = 'absolute';
-            celebrationDiv.style.top = '50%';
-            celebrationDiv.style.left = '50%';
-            celebrationDiv.style.transform = 'translate(-50%, -50%)';
-            celebrationDiv.style.zIndex = 20;
-            celebrationDiv.style.background = '#fff';
-            celebrationDiv.style.padding = '30px 60px';
-            celebrationDiv.style.borderRadius = '18px';
-            celebrationDiv.style.fontSize = '26px';
-            celebrationDiv.style.boxShadow = '0 8px 32px rgba(0,0,0,0.19)';
-            celebrationDiv.innerText = type === 'candy' ? `🍬 Won ${amount} Candy!` : `🪙 Won ${amount} Coins!`;
-            document.body.appendChild(celebrationDiv);
-            setTimeout(() => celebrationDiv.remove(), 1500);
-        }
-
-        function updateGame() {
-            if (!gameRunning) return;
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            drawVendor(); // Vendor behind holes
-            drawHoles();
-            const currentTime = Date.now() / 1000;
-            // Slow down character pop timing and mole duration
-            if (currentTime - lastPopTime > Math.random() * 2 + 1.5) { // 1.5-3.5s
-                if (Math.random() < 0.7) {
-                    const hole = holes[Math.floor(Math.random() * holes.length)];
-                    moles.push({x: hole.x, y: hole.y, expireTime: currentTime + Math.random() * 3 + 2});
-                }
-                lastPopTime = currentTime;
-            }
-            moles = moles.filter(mole => currentTime < mole.expireTime);
-            moles.forEach(mole => drawLegoMinifig(mole.x, mole.y));
-            document.getElementById('score').innerText = `Coins: ${coins}/${coinLimit} | Candy: ${candy}`;
-            if (coins >= coinLimit) {
-                gameRunning = false;
-                document.getElementById('final-coins').innerText = coins;
-                document.getElementById('final-candy').innerText = candy;
-                document.getElementById('game-over').style.display = 'block';
-            }
-            requestAnimationFrame(updateGame);
-        }
-
-        function startGame() {
-            const input = document.getElementById('coin-limit').value;
-            coinLimit = parseInt(input) || 5000;
-            if (coinLimit <= 0) {
-                alert('Please enter a valid coin limit!');
-                return;
-            }
-            document.getElementById('menu').style.display = 'none';
-            gameRunning = true;
-            lastPopTime = Date.now() / 1000;
-            updateGame();
-        }
-
-        function resetGame() {
-            coins = 0;
-            candy = 0;
-            moles = [];
-            gameRunning = false;
-            document.getElementById('game-over').style.display = 'none';
-            document.getElementById('menu').style.display = 'block';
-            document.getElementById('coin-limit').value = '';
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            drawVendor();
-            drawHoles();
-        }
-
-        // Celebration logic and game rewards
-        canvas.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            const touch = e.touches[0];
-            const rect = canvas.getBoundingClientRect();
-            const x = (touch.clientX - rect.left) * (canvas.width / rect.width);
-            const y = (touch.clientY - rect.top) * (canvas.height / rect.height);
-            moles.forEach((mole, index) => {
-                if (x > mole.x && x < mole.x + 50 && y > mole.y && y < mole.y + 75) {
-                    const candyWon = Math.floor(Math.random() * 5) + 1;
-                    const coinsWon = Math.floor(Math.random() * 10) + 1;
-                    candy += candyWon;
-                    coins += coinsWon;
-                    if (coins > coinLimit) coins = coinLimit;
-                    showCelebration('candy', candyWon);
-                    showCelebration('coin', coinsWon);
-                    moles.splice(index, 1);
-                }
-            });
         });
+        ctx.restore();
+    }
 
-        // Also support desktop click
-        canvas.addEventListener('mousedown', (e) => {
-            const rect = canvas.getBoundingClientRect();
-            const x = (e.clientX - rect.left) * (canvas.width / rect.width);
-            const y = (e.clientY - rect.top) * (canvas.height / rect.height);
-            moles.forEach((mole, index) => {
-                if (x > mole.x && x < mole.x + 50 && y > mole.y && y < mole.y + 75) {
-                    const candyWon = Math.floor(Math.random() * 5) + 1;
-                    const coinsWon = Math.floor(Math.random() * 10) + 1;
-                    candy += candyWon;
-                    coins += coinsWon;
-                    if (coins > coinLimit) coins = coinLimit;
-                    showCelebration('candy', candyWon);
-                    showCelebration('coin', coinsWon);
-                    moles.splice(index, 1);
-                }
-            });
+    function drawVendor() {
+        ctx.save();
+        // Taller vendor body
+        ctx.fillStyle = '#D4B483';
+        ctx.fillRect(170, 0, 60, 130);
+        // Head
+        ctx.fillStyle = '#FFC080';
+        ctx.beginPath();
+        ctx.ellipse(200, 40, 22, 28, 0, 0, Math.PI * 2);
+        ctx.fill();
+        // Eyes
+        ctx.fillStyle = '#000';
+        ctx.beginPath();
+        ctx.arc(190, 38, 3, 0, Math.PI * 2);
+        ctx.arc(210, 38, 3, 0, Math.PI * 2);
+        ctx.fill();
+        // Smile
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(200, 50, 10, 0, Math.PI);
+        ctx.stroke();
+        // Shirt shading
+        const grad = ctx.createLinearGradient(170, 0, 230, 130);
+        grad.addColorStop(0, '#c1a060');
+        grad.addColorStop(1, '#8f7d40');
+        ctx.fillStyle = grad;
+        ctx.fillRect(170, 0, 60, 130);
+        // Arms
+        ctx.fillStyle = '#D4B483';
+        ctx.fillRect(160, 40, 15, 30);
+        ctx.fillRect(215, 40, 15, 30);
+        // Legs behind table to create layering illusion
+        // Table stand
+        ctx.fillStyle = '#825F19';
+        ctx.fillRect(160, 130, 80, 18);
+        // Text on table
+        ctx.font = "bold 18px Arial";
+        ctx.fillStyle = '#fff';
+        ctx.fillText('Vendor', 170, 143);
+        ctx.restore();
+    }
+
+    function updateParticles() {
+        particles = particles.filter(p => p.isAlive());
+        particles.forEach(p => {
+            p.update();
+            p.draw(ctx);
         });
+    }
 
-        // Initial draw
+    function updateGame() {
+        if (!gameRunning) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawVendor();
         drawHoles();
+        const currentTime = Date.now() / 1000;
+        if (currentTime - lastPopTime > Math.random() * 2 + 1.5) {
+            if (Math.random() < 0.7) {
+                const hole = holes[Math.floor(Math.random() * holes.length)];
+                moles.push({x: hole.x, y: hole.y, expireTime: currentTime + Math.random() * 3 + 2});
+            }
+            lastPopTime = currentTime;
+        }
+        moles = moles.filter(mole => currentTime < mole.expireTime);
+        moles.forEach(mole => drawLegoMinifig(mole.x, mole.y));
+        updateParticles();
+
+        document.getElementById('score').innerText = `Coins: ${coins}/${coinLimit} | Candy: ${candy}`;
+
+        if (coins >= coinLimit) {
+            gameRunning = false;
+            document.getElementById('final-coins').innerText = coins;
+            document.getElementById('final-candy').innerText = candy;
+            document.getElementById('game-over').style.display = 'block';
+        }
+        requestAnimationFrame(updateGame);
+    }
+
+    function startGame() {
+        const input = document.getElementById('coin-limit').value;
+        coinLimit = parseInt(input) || 5000;
+        if (coinLimit <= 0) {
+            alert('Please enter a valid coin limit!');
+            return;
+        }
+        document.getElementById('menu').style.display = 'none';
+        gameRunning = true;
+        coins = 0; candy = 0; moles = [];
+        particles = [];
+        lastPopTime = Date.now() / 1000;
         updateGame();
-    </script>
+    }
+
+    function resetGame() {
+        coins = 0;
+        candy = 0;
+        moles = [];
+        particles = [];
+        gameRunning = false;
+        document.getElementById('game-over').style.display = 'none';
+        document.getElementById('menu').style.display = 'block';
+        document.getElementById('coin-limit').value = '';
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawVendor();
+        drawHoles();
+    }
+
+    function checkHit(x, y) {
+        for (let i = 0; i < moles.length; ++i) {
+            let mole = moles[i];
+            if (x > mole.x && x < mole.x + 50 && y > mole.y && y < mole.y + 75) {
+                const candyWon = Math.floor(Math.random() * 5) + 1;
+                const coinsWon = Math.floor(Math.random() * 10) + 1;
+                candy += candyWon;
+                coins += coinsWon;
+                if (coins > coinLimit) coins = coinLimit;
+                // Emit candy and coin particles from mole position
+                emitParticles('candy', mole.x + 25, mole.y + 40, candyWon * 3);
+                emitParticles('coin', mole.x + 25, mole.y + 40, coinsWon * 2);
+                moles.splice(i, 1);
+                break;
+            }
+        }
+    }
+
+    canvas.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        const x = (touch.clientX - rect.left) * (canvas.width / rect.width);
+        const y = (touch.clientY - rect.top) * (canvas.height / rect.height);
+        checkHit(x, y);
+    });
+
+    canvas.addEventListener('mousedown', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+        const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+        checkHit(x, y);
+    });
+
+    // Initial drawing
+    drawVendor();
+    drawHoles();
+
+    window.addEventListener('resize', () => {
+        particles = [];
+    });
+</script>
 </body>
 </html>
