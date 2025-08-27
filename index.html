@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+
+        <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -7,7 +8,7 @@
     <style>
         body {
             margin: 0;
-            background: linear-gradient(135deg, #ff9900, #ffcc00); /* Modern orange gradient */
+            background: linear-gradient(135deg, #ff9900, #ffcc00);
             font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
@@ -23,7 +24,7 @@
         }
         canvas {
             border: 3px solid #222;
-            background-color: #00aa00; /* Green field */
+            background-color: #00aa00;
             max-width: 90vw;
             max-height: 65vh;
             display: block;
@@ -57,7 +58,7 @@
         #menu button {
             padding: 8px 20px;
             font-size: 14px;
-            background-color: #ff4500; /* Lego red */
+            background-color: #ff4500;
             color: white;
             border: none;
             border-radius: 5px;
@@ -154,29 +155,23 @@
         let gameRunning = false;
 
         function drawLegoMinifig(x, y) {
-            // Head
-            ctx.fillStyle = '#FFFF00'; // Yellow
+            ctx.fillStyle = '#FFFF00';
             ctx.beginPath();
             ctx.arc(x + 25, y + 10, 15, 0, Math.PI * 2);
             ctx.fill();
-            // Body (random color for variety)
             ctx.fillStyle = ['#0000FF', '#FF0000', '#00FF00'][Math.floor(Math.random() * 3)];
             ctx.fillRect(x + 10, y + 25, 30, 30);
-            // Arms
             ctx.fillStyle = '#FFFF00';
             ctx.fillRect(x, y + 25, 10, 30);
             ctx.fillRect(x + 40, y + 25, 10, 30);
-            // Legs
             ctx.fillStyle = '#FF0000';
             ctx.fillRect(x + 10, y + 55, 15, 20);
             ctx.fillRect(x + 25, y + 55, 15, 20);
-            // Eyes
             ctx.fillStyle = '#000000';
             ctx.beginPath();
             ctx.arc(x + 20, y + 5, 2, 0, Math.PI * 2);
             ctx.arc(x + 30, y + 5, 2, 0, Math.PI * 2);
             ctx.fill();
-            // Mouth (smiling)
             ctx.strokeStyle = '#000000';
             ctx.lineWidth = 2;
             ctx.beginPath();
@@ -193,15 +188,64 @@
             });
         }
 
+        // New: Draw vendor behind holes
+        function drawVendor() {
+            // Vendor Body
+            ctx.fillStyle = '#C0A060';
+            ctx.fillRect(170, 10, 60, 100);
+            // Vendor Head
+            ctx.fillStyle = '#FFC080';
+            ctx.beginPath();
+            ctx.arc(200, 30, 22, 0, Math.PI * 2);
+            ctx.fill();
+            // Vendor Face/Eyes
+            ctx.fillStyle = '#000';
+            ctx.beginPath();
+            ctx.arc(190, 28, 3, 0, Math.PI * 2);
+            ctx.arc(210, 28, 3, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(200, 35, 7, 0, Math.PI);
+            ctx.stroke();
+            // Vendor Stand
+            ctx.fillStyle = '#825F19';
+            ctx.fillRect(160, 110, 80, 18);
+            ctx.font = "bold 18px Arial";
+            ctx.fillStyle = '#fff';
+            ctx.fillText('Vendor', 170, 123);
+        }
+
+        // New: Celebration popup
+        function showCelebration(type, amount) {
+            const celebrationDiv = document.createElement('div');
+            celebrationDiv.style.position = 'absolute';
+            celebrationDiv.style.top = '50%';
+            celebrationDiv.style.left = '50%';
+            celebrationDiv.style.transform = 'translate(-50%, -50%)';
+            celebrationDiv.style.zIndex = 20;
+            celebrationDiv.style.background = '#fff';
+            celebrationDiv.style.padding = '30px 60px';
+            celebrationDiv.style.borderRadius = '18px';
+            celebrationDiv.style.fontSize = '26px';
+            celebrationDiv.style.boxShadow = '0 8px 32px rgba(0,0,0,0.19)';
+            celebrationDiv.innerText = type === 'candy' ? `🍬 Won ${amount} Candy!` : `🪙 Won ${amount} Coins!`;
+            document.body.appendChild(celebrationDiv);
+            setTimeout(() => celebrationDiv.remove(), 1500);
+        }
+
         function updateGame() {
             if (!gameRunning) return;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawVendor(); // Vendor behind holes
             drawHoles();
             const currentTime = Date.now() / 1000;
-            if (currentTime - lastPopTime > Math.random() * 1.5 + 0.5) { // 0.5-2s
-                if (Math.random() < 0.7) { // 70% chance
+            // Slow down character pop timing and mole duration
+            if (currentTime - lastPopTime > Math.random() * 2 + 1.5) { // 1.5-3.5s
+                if (Math.random() < 0.7) {
                     const hole = holes[Math.floor(Math.random() * holes.length)];
-                    moles.push({x: hole.x, y: hole.y, expireTime: currentTime + Math.random() * 2 + 1});
+                    moles.push({x: hole.x, y: hole.y, expireTime: currentTime + Math.random() * 3 + 2});
                 }
                 lastPopTime = currentTime;
             }
@@ -239,9 +283,11 @@
             document.getElementById('menu').style.display = 'block';
             document.getElementById('coin-limit').value = '';
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawVendor();
             drawHoles();
         }
 
+        // Celebration logic and game rewards
         canvas.addEventListener('touchstart', (e) => {
             e.preventDefault();
             const touch = e.touches[0];
@@ -250,15 +296,39 @@
             const y = (touch.clientY - rect.top) * (canvas.height / rect.height);
             moles.forEach((mole, index) => {
                 if (x > mole.x && x < mole.x + 50 && y > mole.y && y < mole.y + 75) {
-                    candy += Math.floor(Math.random() * 5) + 1; // 1-5 candy
-                    coins += Math.floor(Math.random() * 10) + 1; // 1-10 coins
+                    const candyWon = Math.floor(Math.random() * 5) + 1;
+                    const coinsWon = Math.floor(Math.random() * 10) + 1;
+                    candy += candyWon;
+                    coins += coinsWon;
                     if (coins > coinLimit) coins = coinLimit;
+                    showCelebration('candy', candyWon);
+                    showCelebration('coin', coinsWon);
+                    moles.splice(index, 1);
+                }
+            });
+        });
+
+        // Also support desktop click
+        canvas.addEventListener('mousedown', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+            const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+            moles.forEach((mole, index) => {
+                if (x > mole.x && x < mole.x + 50 && y > mole.y && y < mole.y + 75) {
+                    const candyWon = Math.floor(Math.random() * 5) + 1;
+                    const coinsWon = Math.floor(Math.random() * 10) + 1;
+                    candy += candyWon;
+                    coins += coinsWon;
+                    if (coins > coinLimit) coins = coinLimit;
+                    showCelebration('candy', candyWon);
+                    showCelebration('coin', coinsWon);
                     moles.splice(index, 1);
                 }
             });
         });
 
         // Initial draw
+        drawVendor();
         drawHoles();
         updateGame();
     </script>
