@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whack-a-Lego</title>
+    <style>
+        body {
+            margin: 0;
+            background: linear-gradient(135deg, #ff9900, #ffcc00); /* Modern orange gradient */
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
+        #game-container {
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+        }
+        canvas {
+            border: 3px solid #222;
+            background-color: #00aa00; /* Green field */
+            max-width: 90vw;
+            max-height: 65vh;
+            display: block;
+            margin: 10px auto;
+            border-radius: 10px;
+        }
+        #menu {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            z-index: 10;
+        }
+        #menu p {
+            margin: 0 0 10px;
+            font-size: 16px;
+            color: #222;
+        }
+        #menu input {
+            padding: 8px;
+            font-size: 14px;
+            width: 160px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+        }
+        #menu button {
+            padding: 8px 20px;
+            font-size: 14px;
+            background-color: #ff4500; /* Lego red */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        #menu button:hover {
+            background-color: #cc3700;
+        }
+        #score {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #fff;
+            font-size: 16px;
+            background: rgba(0,0,0,0.6);
+            padding: 5px 10px;
+            border-radius: 5px;
+            text-shadow: 1px 1px 2px #000;
+        }
+        #game-over {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            text-align: center;
+            z-index: 10;
+        }
+        #game-over p {
+            font-size: 20px;
+            color: #ff4500;
+            margin: 0 0 10px;
+        }
+        #game-over button {
+            padding: 8px 20px;
+            font-size: 14px;
+            background-color: #ff4500;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #game-over button:hover {
+            background-color: #cc3700;
+        }
+        @media (max-width: 600px) {
+            canvas {
+                width: 90vw;
+                height: 55vh;
+            }
+            #menu p, #menu input, #menu button, #score, #game-over p, #game-over button {
+                font-size: 12px;
+            }
+            #menu input {
+                width: 130px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="menu">
+            <p>Parent: Set Coin Limit (e.g., 5000)</p>
+            <input type="number" id="coin-limit" placeholder="Enter coin limit">
+            <br>
+            <button onclick="startGame()">Start Game</button>
+        </div>
+        <div id="score">Coins: 0/0 | Candy: 0</div>
+        <canvas id="game-canvas" width="400" height="300"></canvas>
+        <div id="game-over">
+            <p>Coin Limit Reached! Game Over.</p>
+            <p>Coins: <span id="final-coins"></span> | Candy: <span id="final-candy"></span></p>
+            <button onclick="resetGame()">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        const holes = [
+            {x: 50, y: 100}, {x: 150, y: 100}, {x: 250, y: 100}, {x: 350, y: 100},
+            {x: 50, y: 200}, {x: 150, y: 200}, {x: 250, y: 200}, {x: 350, y: 200}
+        ];
+        let moles = [];
+        let coins = 0;
+        let candy = 0;
+        let coinLimit = 0;
+        let lastPopTime = 0;
+        let gameRunning = false;
+
+        function drawLegoMinifig(x, y) {
+            // Head
+            ctx.fillStyle = '#FFFF00'; // Yellow
+            ctx.beginPath();
+            ctx.arc(x + 25, y + 10, 15, 0, Math.PI * 2);
+            ctx.fill();
+            // Body (random color for variety)
+            ctx.fillStyle = ['#0000FF', '#FF0000', '#00FF00'][Math.floor(Math.random() * 3)];
+            ctx.fillRect(x + 10, y + 25, 30, 30);
+            // Arms
+            ctx.fillStyle = '#FFFF00';
+            ctx.fillRect(x, y + 25, 10, 30);
+            ctx.fillRect(x + 40, y + 25, 10, 30);
+            // Legs
+            ctx.fillStyle = '#FF0000';
+            ctx.fillRect(x + 10, y + 55, 15, 20);
+            ctx.fillRect(x + 25, y + 55, 15, 20);
+            // Eyes
+            ctx.fillStyle = '#000000';
+            ctx.beginPath();
+            ctx.arc(x + 20, y + 5, 2, 0, Math.PI * 2);
+            ctx.arc(x + 30, y + 5, 2, 0, Math.PI * 2);
+            ctx.fill();
+            // Mouth (smiling)
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(x + 25, y + 12, 5, 0, Math.PI);
+            ctx.stroke();
+        }
+
+        function drawHoles() {
+            ctx.fillStyle = '#222222';
+            holes.forEach(hole => {
+                ctx.beginPath();
+                ctx.ellipse(hole.x + 25, hole.y + 50, 25, 10, 0, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        function updateGame() {
+            if (!gameRunning) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawHoles();
+            const currentTime = Date.now() / 1000;
+            if (currentTime - lastPopTime > Math.random() * 1.5 + 0.5) { // 0.5-2s
+                if (Math.random() < 0.7) { // 70% chance
+                    const hole = holes[Math.floor(Math.random() * holes.length)];
+                    moles.push({x: hole.x, y: hole.y, expireTime: currentTime + Math.random() * 2 + 1});
+                }
+                lastPopTime = currentTime;
+            }
+            moles = moles.filter(mole => currentTime < mole.expireTime);
+            moles.forEach(mole => drawLegoMinifig(mole.x, mole.y));
+            document.getElementById('score').innerText = `Coins: ${coins}/${coinLimit} | Candy: ${candy}`;
+            if (coins >= coinLimit) {
+                gameRunning = false;
+                document.getElementById('final-coins').innerText = coins;
+                document.getElementById('final-candy').innerText = candy;
+                document.getElementById('game-over').style.display = 'block';
+            }
+            requestAnimationFrame(updateGame);
+        }
+
+        function startGame() {
+            const input = document.getElementById('coin-limit').value;
+            coinLimit = parseInt(input) || 5000;
+            if (coinLimit <= 0) {
+                alert('Please enter a valid coin limit!');
+                return;
+            }
+            document.getElementById('menu').style.display = 'none';
+            gameRunning = true;
+            lastPopTime = Date.now() / 1000;
+            updateGame();
+        }
+
+        function resetGame() {
+            coins = 0;
+            candy = 0;
+            moles = [];
+            gameRunning = false;
+            document.getElementById('game-over').style.display = 'none';
+            document.getElementById('menu').style.display = 'block';
+            document.getElementById('coin-limit').value = '';
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawHoles();
+        }
+
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            const x = (touch.clientX - rect.left) * (canvas.width / rect.width);
+            const y = (touch.clientY - rect.top) * (canvas.height / rect.height);
+            moles.forEach((mole, index) => {
+                if (x > mole.x && x < mole.x + 50 && y > mole.y && y < mole.y + 75) {
+                    candy += Math.floor(Math.random() * 5) + 1; // 1-5 candy
+                    coins += Math.floor(Math.random() * 10) + 1; // 1-10 coins
+                    if (coins > coinLimit) coins = coinLimit;
+                    moles.splice(index, 1);
+                }
+            });
+        });
+
+        // Initial draw
+        drawHoles();
+        updateGame();
+    </script>
+</body>
+</html>
